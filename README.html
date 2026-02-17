@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vignette.js | Dedicated MLP Library</title>
+    
+    <script src="https://raw.githack.com/nidkawai-code/Vignette/main/Vignette_MLP.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+
+        :root {
+            --bg: #050112;
+            --card-bg: #0f0524;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #9d4edd;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #2d1b4d;
+            --code-bg: #000000;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0; line-height: 1.6;
+            background-image: radial-gradient(circle at 50% 0%, #1a0b3b 0%, var(--bg) 70%);
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+
+        header { text-align: center; margin-bottom: 60px; }
+        .logo { font-size: 4rem; font-weight: 800; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .badge { background: var(--accent-secondary); color: white; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+
+        h2 { color: var(--accent-primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 50px; }
+        
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 30px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        .copy-btn {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(255,255,255,0.1); color: var(--accent-primary);
+            border: 1px solid var(--border); padding: 5px 12px; border-radius: 6px;
+            font-size: 0.7rem; cursor: pointer; transition: 0.3s;
+        }
+        .copy-btn:hover { background: var(--accent-primary); color: var(--bg); }
+
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
+        .tech-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .tech-card h4 { margin: 0 0 10px 0; color: var(--accent-secondary); font-size: 0.85rem; text-transform: uppercase; border-bottom: 1px solid #ffffff10; padding-bottom: 5px; }
+        .tech-card ul { list-style: none; padding: 0; margin: 0; font-size: 0.8rem; color: var(--text-dim); columns: 2; }
+        
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 15px; }
+        .data-item { font-family: 'Fira Code', monospace; font-size: 0.75rem; background: #000; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
+        .data-item b { color: var(--accent-primary); display: block; margin-bottom: 5px; font-family: 'Plus Jakarta Sans'; }
+
+        pre { background: var(--code-bg); padding: 20px; border-radius: 12px; overflow-x: auto; border: 1px solid var(--border); font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #d1d5db; margin: 0; }
+        .kw { color: #c678dd; } .fn { color: #61afef; } .st { color: #98c379; } .cm { color: #5c6370; } .nm { color: #d19a66; }
+
+        .live-demo { background: #000; border: 1px solid var(--accent-primary); border-radius: 15px; padding: 20px; }
+        #log-output { height: 200px; overflow-y: auto; font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #4ade80; white-space: pre-wrap; }
+        .btn-run { background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        .btn-run:hover { transform: scale(1.05); filter: brightness(1.2); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 class="logo">Vignette.js</h1>
+        <span class="badge">Dedicated Multi-Layer Perceptron Library</span>
+        <p style="color: var(--text-dim); margin-top: 15px;">Deep Learning minimalis untuk kendali arsitektur MLP tanpa batas.</p>
+    </header>
+
+    
+
+    <section class="card">
+        <h2>📊 Dataset Format Support</h2>
+        <div class="data-grid">
+            <div class="data-item">
+                <b>1D (Flattened)</b>
+                [input_sz, target_sz, ...data]<br>
+                [2, 1, 0,0,1, 0,1,1, 1,0,1, 1,1,0]
+            </div>
+            <div class="data-item">
+                <b>2D (Separated)</b>
+                [[...inputs], [...targets]]<br>
+                [[[0,0],[0,1]], [[1],[1]]]
+            </div>
+            <div class="data-item">
+                <b>3D (Pairs)</b>
+                [[input, target], ...]<br>
+                [[[0,0], [1]], [[0,1], [1]]]
+            </div>
+            <div class="data-item">
+                <b>Normal (Object)</b>
+                [{x:[], y:[]}, ...]<br>
+                [{x:[0,0], y:[1]}, {x:[1,1], y:[0]}]
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>🚀 Spesifikasi Fitur</h2>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <h4>14 Aktivasi</h4>
+                <ul>
+                    <li>1. relu</li><li>2. linear</li><li>3. sigmoid</li><li>4. tanh</li><li>5. leaky</li><li>6. elu</li><li>7. selu</li><li>8. gelu</li><li>9. swish</li><li>10. mish</li><li>11. softplus</li><li>12. softsign</li><li>13. hardtanh</li><li>14. softmax</li>
+                </ul>
+            </div>
+            <div class="tech-card">
+                <h4>8 Inisialisasi</h4>
+                <ul>
+                    <li>1. basic</li><li>2. normal</li><li>3. xavier</li><li>4. xavier_n</li><li>5. he</li><li>6. he_n</li><li>7. lecun</li><li>8. lecun_n</li>
+                </ul>
+            </div>
+            <div class="tech-card">
+                <h4>9 Optimizer</h4>
+                <ul>
+                    <li>1. sgd</li><li>2. momentum</li><li>3. nesterov</li><li>4. adagrad</li><li>5. rmsprop</li><li>6. adadelta</li><li>7. adam</li><li>8. adamax</li><li>9. nadam</li>
+                </ul>
+            </div>
+            <div class="tech-card">
+                <h4>6 Loss Function</h4>
+                <ul>
+                    <li>1. mse</li><li>2. mae</li><li>3. bce</li><li>4. ce</li><li>5. hinge</li><li>6. huber</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tech-card" style="margin-top:15px; width: fit-content; padding-right: 40px;">
+            <h4>Regularisasi</h4>
+            <p style="font-size: 0.8rem; margin: 5px 0 0 0; color: var(--text-dim);">l1, l2, l1_l2, elastic, none</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>📖 Full Implementation Guide</h2>
+        <div class="card">
+            <button class="copy-btn" onclick="copyCode('fullCode')">Salin Kode</button>
+            <pre id="fullCode"><code><span class="cm">// Load: https://raw.githack.com/nidkawai-code/Vignette/main/Vignette_MLP.js</span>
+<span class="kw">const</span> m = <span class="kw">new</span> <span class="fn">Vignette</span>();
+
+<span class="cm">// 1. Dataset (Contoh format '1d')</span>
+<span class="kw">const</span> data = [<span class="nm">2</span>,<span class="nm">1</span>, <span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>, <span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">1</span>, <span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>, <span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>];
+m.<span class="fn">autoData</span>(<span class="st">'1d'</span>, data);
+
+<span class="cm">// 2. Arsitektur: [Lapis], [Aktivasi], [Inisiasi], Leak_Alpha</span>
+m.<span class="fn">order</span>([<span class="nm">2</span>,<span class="nm">8</span>,<span class="nm">1</span>], [<span class="st">'leaky'</span>,<span class="st">'linear'</span>], [<span class="st">'basic'</span>,<span class="st">'basic'</span>], <span class="nm">0.01</span>);
+
+<span class="cm">// 3. Config Hyperparameter</span>
+m.<span class="fn">config</span>(c => {
+    c.lr = <span class="nm">0.2</span>;
+    c.loss = <span class="st">'mse'</span>;
+    c.optimizer = <span class="st">'sgd'</span>;
+    c.regular = <span class="st">'l1'</span>;
+    c.lambda = <span class="nm">0.001</span>;
+    c.batch = <span class="nm">2</span>;
+});
+
+<span class="cm">// 4. Training</span>
+m.<span class="fn">fit</span>(<span class="nm">100</span>, i => {
+   <span class="cm">// i.loss, i.epoch, i.c (akses config)</span>
+   <span class="cm">// i.c.train = false; (berhenti training)</span>
+});
+
+<span class="cm">// 5. Inference & IO</span>
+m.<span class="fn">quest</span>(input);      <span class="cm">// Prediksi tunggal</span>
+m.<span class="fn">quest_all</span>();   <span class="cm">// Data aktivasi & derivative lengkap</span>
+m.<span class="fn">save</span>();             <span class="cm">// Ambil model JSON</span>
+m.<span class="fn">load</span>(json);         <span class="cm">// Load model JSON</span></code></pre>
+        </div>
+    </section>
+
+    <section>
+        <h2>📦 Model Structure (JSON)</h2>
+        <div class="card">
+            <button class="copy-btn" onclick="copyCode('jsonCode')">Salin JSON</button>
+            <pre id="jsonCode"><code>{
+  <span class="st">"l"</span>: [<span class="nm">2</span>, <span class="nm">8</span>, <span class="nm">1</span>],
+  <span class="st">"a"</span>: [<span class="st">"leaky"</span>, <span class="st">"linear"</span>],
+  <span class="st">"v"</span>: [<span class="nm">0.776</span>, <span class="nm">-0.859</span>, <span class="nm">0</span>, <span class="nm">-0.235</span>, <span class="nm">...</span>],
+  <span class="st">"alpha"</span>: <span class="nm">0.01</span>,
+  <span class="st">"c"</span>: <span class="st">""</span>
+}</code></pre>
+        </div>
+    </section>
+
+    <section>
+        <h2>🎮 Live Training Demo</h2>
+        <div class="card live-demo">
+            <div id="log-output">> Engine Ready. Klik tombol untuk memulai m.fit()...</div>
+            <button class="btn-run" onclick="runTraining()">Jalankan XOR Training</button>
+        </div>
+    </section>
+
+    <footer style="text-align: center; color: var(--text-dim); padding: 40px; font-size: 0.8rem;">
+        Vignette.js © 2024 - Pure JS MLP Engine
+    </footer>
+</div>
+
+<script>
+    function copyCode(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Tersalin!";
+            setTimeout(() => btn.innerText = originalText, 2000);
+        });
+    }
+
+    function runTraining() {
+        const out = document.getElementById('log-output');
+        out.innerHTML = "> Inisialisasi m = new Vignette()...\n";
+        
+        try {
+            const m = new Vignette();
+            const data = [2,1, 0,0,1, 0,1,1, 1,0,1, 1,1,0];
+            m.autoData('1d', data);
+            m.order([2,10,1],['leaky','linear'],['basic','basic'],0.01);
+            m.config(c => { c.lr = 0.2; c.optimizer = 'sgd'; });
+
+            m.fit(100, i => {
+                if(i.epoch % 10 === 0) {
+                    out.innerHTML += `> Epoch ${i.epoch} | Loss: ${i.loss.toFixed(6)}\n`;
+                    out.scrollTop = out.scrollHeight;
+                }
+            });
+
+            const res = m.quest([1,1]);
+            out.innerHTML += `\n> Selesai! Prediksi [1,1] (XOR) => ${res[0].toFixed(4)} (Target: 0)\n`;
+            out.scrollTop = out.scrollHeight;
+        } catch(e) {
+            out.innerHTML += `\n> Error: Gagal memuat library atau training.\n${e}`;
+        }
+    }
+</script>
+
+</body>
+</html>
