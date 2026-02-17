@@ -319,7 +319,7 @@ function ___c(){
 
 
 // Class MLP
-class myMlp{
+class Vignette{
     constructor(){
         this.info='mlp _nidkawai';
         this.data=[];
