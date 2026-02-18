@@ -398,7 +398,7 @@ class Vignette{
         return ___p(i,this.model);
     }
     fit(e,c){
-        if(!this.model.c)this.model.c=___();
+        if(!this.model.c)this.model.c=___c();
         if(!this.data.length)throw 'no data loaded';
         ___f(e,this.data,this.model,c);
         return this;
