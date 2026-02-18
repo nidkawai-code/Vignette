@@ -278,7 +278,7 @@ function ___c(){
     return{
         lr:0.2,
         loss:'mse',
-        optimizer:'adam',
+        optimizer:'sgd',
         batch:1,
         regular:'none',
         lambda:0.0001,
