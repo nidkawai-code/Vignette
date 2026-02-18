@@ -1,6 +1,6 @@
 
 // Inis
-function ___i(l,a,r,_a,_b){
+function ___i(l,a,r,_a=0.1,_b=1.0){
     const v=[];
     for(let _=0;_<l.length-1;_++){
         for(let __=0;__<l[_+1];__++){
@@ -10,10 +10,7 @@ function ___i(l,a,r,_a,_b){
             v.push(0);
         }
     }
-    if(_a&&_b)return {l,a,v,alpha:_a,beta:_b}
-    if(_a&&!_b)return {l,a,v,alpha:_a}
-    if(_b&&!_a)return {l,a,v,beta:_b}
-    return {l,a,v}
+    return {l,a,v,alpha:_a,beta:_b}
 }
 
 function ___r(_,i,o){
