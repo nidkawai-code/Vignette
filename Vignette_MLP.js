@@ -11,8 +11,8 @@ function ___i(l,a,r,_a,_b){
         }
     }
     if(_a&&_b)return {l,a,v,alpha:_a,beta:_b}
-    if(_a)return {l,a,v,alpha:_a}
-    if(_b)return {l,a,v,beta:_b}
+    if(_a&&!_b)return {l,a,v,alpha:_a}
+    if(_b&&!_a)return {l,a,v,beta:_b}
     return {l,a,v}
 }
 
