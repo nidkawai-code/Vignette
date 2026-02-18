@@ -10,8 +10,10 @@ function ___i(l,a,r,_a){
             v.push(0);
         }
     }
-    if(!_a)return {l,a,v}
-    return {l,a,v,alpha:_a}
+    if(_a&&_b)return {l,a,v,alpha:_a,beta:_b}
+    if(_a)return {l,a,v,alpha:_a}
+    if(_b)return {l,a,v,beta:_b}
+    return {l,a,v}
 }
 
 function ___r(_,i,o){
