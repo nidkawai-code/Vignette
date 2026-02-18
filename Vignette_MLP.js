@@ -10,7 +10,7 @@ function ___i(l,a,r,_a=0.1,_b=1.0){
             v.push(0);
         }
     }
-    return {l,a,v,alpha:_a,beta:_b}
+    return {l,a,v,...(_a!==undefined&&{alpha:_a}),...(_b!==undefined&&{beta:_b}),c:{clip_a:'none'}}
 }
 
 function ___r(_,i,o){
@@ -77,7 +77,7 @@ function ___p(i,m,_m){
             }
             i_.push(s+m.v[_i]);_i++;w.push(0);
         }
-        if(m.c)i_=___ca(m.c.clip_a,i_,m,m.a[_]);
+        i_=___ca(m.c.clip_a,i_,m,m.a[_]);
         if(!_m){a.push(___a(m.a[_],i_,m));d.push(___a(m.a[_]+'_d',i_,m))}
         i=___a(m.a[_],i_,m);
     }
@@ -402,7 +402,7 @@ class Vignette{
         return this;
     }
     save(){
-        this.model.c='';
+        this.model.c = {clip_a:'none'}
         return JSON.stringify(this.model,null,2);
     }
     load(json){
