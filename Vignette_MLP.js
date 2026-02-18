@@ -278,7 +278,7 @@ function ___c(){
     return{
         lr:0.2,
         loss:'mse',
-        optimizer:'sgd',
+        optimizer:'adam',
         batch:1,
         regular:'none',
         lambda:0.0001,
@@ -398,6 +398,7 @@ class Vignette{
         return ___p(i,this.model);
     }
     fit(e,c){
+        if(!this.model.c)this.model.c=___();
         if(!this.data.length)throw 'no data loaded';
         ___f(e,this.data,this.model,c);
         return this;
