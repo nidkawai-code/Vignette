@@ -1,5 +1,4 @@
 
-
 // Inis
 function ___i(l,a,r,_a){
     const v=[];
@@ -14,6 +13,7 @@ function ___i(l,a,r,_a){
     if(!_a)return {l,a,v}
     return {l,a,v,alpha:_a}
 }
+
 function ___r(_,i,o){
     if('basic'===_)return Math.random()*2-1;
     if('normal'===_){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
@@ -35,21 +35,21 @@ function ___a(_,d,m){
     if('linear'===_)return d;
     if('linear_d'===_)return d.map(()=>1);
     if('sigmoid'===_)return d.map(__=>1/(1+Math.exp(-__)));
-    if('sigmoid_d'===_){const s=___a('sigmoid',d);return s.map(__=>__*(1-__))}
+    if('sigmoid_d'===_){return d.map(__=>{const s=1/(1+Math.exp(-__));return s*(1-s)})};
     if('tanh'===_)return d.map(__=>Math.tanh(__));
-    if('tanh_d'===_){const t=___a('tanh',d);return t.map(__=>1-(__*__))}
+    if('tanh_d'===_)return d.map(__=>{const t=Math.tanh(__);return 1-(t*t)});
     if('leaky'===_)return d.map(__=>__>0?__:__*m.alpha);
     if('leaky_d'===_)return d.map(__=>__>0?1:m.alpha);
     if('elu'===_)return d.map(__=>__>0?__:m.alpha*(Math.exp(__)-1));
     if('elu_d'===_)return d.map(__=>__>0?1:m.alpha*Math.exp(__));
     if('selu'===_){const la=1.0507,al=1.67326;return d.map(__=>__>0?la*__:la*al*(Math.exp(__)-1));}
     if('selu_d'===_){const la=1.0507,al=1.67326;return d.map(__=>__>0?la:la*al*Math.exp(__));}
-    if('gelu'===_)return d.map(__=>__*0.5*(1+Math.tanh(Math.sqrt(2/Math.PI)*(__+0.044715*__*__*__))));
-    if('gelu_d'===_)return d.map(__=>{const t=Math.tanh(0.0356774*__*__*__+0.797885*__);return 0.5+0.5*t+(0.5*__*(1-t*t))*(0.107032*__*__+0.797885);});
+    if('gelu'===_)return d.map(__=>0.5*__*(1+Math.tanh(Math.sqrt(2/Math.PI)*(__+0.044715*Math.pow(__,3)))));
+    if('gelu_d'===_)return d.map(__=>{const c=Math.sqrt(2/Math.PI), g=0.044715*Math.pow(__,3), t=Math.tanh(c*(__+g));return 0.5*(1+t)+0.5*__*(1-t*t)*c*(1+3*0.044715*__*__);});
     if('swish'===_)return d.map(__=>__/(1+Math.exp(-__*m.beta)));
     if('swish_d'===_)return d.map(__=>{const s=1/(1+Math.exp(-__*m.beta));return s+__*m.beta*s*(1-s);});
     if('mish'===_)return d.map(__=>__*Math.tanh(Math.log(1+Math.exp(__))));
-    if('mish_d'===_)return d.map(__=>{const sp=Math.exp(__);const om=1+sp;const th=Math.tanh(Math.log(om));return th+__*sp*(1-th*th)/om;});
+    if('mish_d'===_)return d.map(__=>{const e=Math.exp(__), n=e*e+2*e+2, d2=e*e+2*e+1;const w=4*(e+1)+4*e*e+e*e*e+Math.pow(e,4);return (e*(w))/(Math.pow(n,2));});
     if('softplus'===_)return d.map(__=>Math.log(1+Math.exp(__)));
     if('softplus_d'===_)return d.map(__=>1/(1+Math.exp(-__)));
     if('softsign'===_)return d.map(__=>__/(1+Math.abs(__)));
@@ -57,13 +57,12 @@ function ___a(_,d,m){
     if('hardtanh'===_)return d.map(__=>Math.max(-1,Math.min(1,__)));
     if('hardtanh_d'===_)return d.map(__=>__>-1&&__<1?1:0);
     if('softmax'===_){
-        const max=Math.max(...d);
-        const exp=d.map(__=>Math.exp(__-max));
-        const sum=exp.reduce((a,b)=>a+b,0);
+        const max=Math.max(...d), exp=d.map(__=>Math.exp(__-max)), sum=exp.reduce((a,b)=>a+b,0);
         return exp.map(__=>__/sum);
     }
     if('softmax_d'===_)return d.map(()=>1);
 }
+
 // Aktivasi e;
 
 
@@ -71,7 +70,7 @@ function ___a(_,d,m){
 function ___p(i,m,_m){
     let a=[[...i]],d=[[]],_i=0,w=[];
     for(let _=0;_<m.l.length-1;_++){
-        const i_=[];
+        let i_=[];
         for(let __=0;__<m.l[_+1];__++){
             let s=0;
             for(let ___=0;___<m.l[_];___++){
@@ -79,6 +78,7 @@ function ___p(i,m,_m){
             }
             i_.push(s+m.v[_i]);_i++;w.push(0);
         }
+        i_=___ca(m.c.clip_a,i_,m,m.a[_]);
         if(!_m){a.push(___a(m.a[_],i_,m));d.push(___a(m.a[_]+'_d',i_,m))}
         i=___a(m.a[_],i_,m);
     }
@@ -87,27 +87,43 @@ function ___p(i,m,_m){
 }
 // Prediksi e;
 
+// Cliping a
+function ___ca(_,x,m,a){
+    if('none'===_)return x;
+    if('value'===_)return x.map(__=>Math.max(m.c.min, Math.min(m.c.max, __)));
+    if('norm'===_){
+        const norm=Math.sqrt(x.reduce((a,b)=>a+b*b,0));
+        if(norm>m.c.threshold) return x.map(__=>__*(m.c.threshold/norm));
+        return x;
+    }
+    if('auto'===_){
+        if(['sigmoid','tanh','exp','elu','softmax'].includes(a)) return x.map(__=>Math.max(-15, Math.min(15, __)));
+        return x;
+    }
+}
+// Cliping a e;
+
 // Loss
 function ___l(_,p,t){
-    const _p=p.a[p.a.length-1];
-    if('mse'===_)return _p.map((__p,i)=>Math.pow(__p-t[i],2)).reduce((a,b)=>a+b,0)/_p.length;
-    if('mse_d'===_)return _p.map((__p,i)=>(__p-t[i])*2/_p.length);
-    if('mae'===_)return _p.map((__p,i)=>Math.abs(__p-t[i])).reduce((a,b)=>a+b,0)/_p.length;
-    if('mae_d'===_)return _p.map((__p,i)=>__p>t[i]?1/_p.length:__p<t[i]?-1/_p.length:0);
-    if('bce'===_)return -_p.map((__p,i)=>t[i]*Math.log(__p+1e-15)+(1-t[i])*Math.log(1-__p+1e-15)).reduce((a,b)=>a+b,0);
+    const _p=p.a[p.a.length-1], n=_p.length;
+    if('mse'===_)return _p.map((__p,i)=>Math.pow(__p-t[i],2)).reduce((a,b)=>a+b,0)/n;
+    if('mse_d'===_)return _p.map((__p,i)=>(__p-t[i])*2/n);
+    if('mae'===_)return _p.map((__p,i)=>Math.abs(__p-t[i])).reduce((a,b)=>a+b,0)/n;
+    if('mae_d'===_)return _p.map((__p,i)=>__p>t[i]?1/n:__p<t[i]?-1/n:0);
+    if('bce'===_)return -_p.map((__p,i)=>t[i]*Math.log(__p+1e-15)+(1-t[i])*Math.log(1-__p+1e-15)).reduce((a,b)=>a+b,0)/n;
     if('bce_d'===_){
         p.d[p.d.length-1]=p.d[p.d.length-1].map(()=>1);
-        return _p.map((__p,i)=>(__p-t[i]));
+        return _p.map((__p,i)=>(__p-t[i])/n);
     }
-    if('ce'===_)return -_p.map((__p,i)=>t[i]*Math.log(__p+1e-15)).reduce((a,b)=>a+b,0);
+    if('ce'===_)return -_p.map((__p,i)=>t[i]*Math.log(__p+1e-15)).reduce((a,b)=>a+b,0)/n;
     if('ce_d'===_){
         p.d[p.d.length-1]=p.d[p.d.length-1].map(()=>1);
-        return _p.map((__p,i)=>__p-t[i]);
+        return _p.map((__p,i)=>(__p-t[i])/n);
     }
-    if('hinge'===_)return _p.map((__p,i)=>Math.max(0,1-t[i]*__p)).reduce((a,b)=>a+b,0)/_p.length;
-    if('hinge_d'===_)return _p.map((__p,i)=>t[i]*__p<1?-t[i]/_p.length:0);
-    if('huber'===_){const d=_p.map((__p,i)=>Math.abs(__p-t[i]));return d.map(__=>__<=1?0.5*__*__:__-0.5).reduce((a,b)=>a+b,0)/_p.length;}
-    if('huber_d'===_){const d=_p.map((__p,i)=>__p-t[i]);return d.map(__=>Math.abs(__)<=1?__:(__>0?1:-1));}
+    if('hinge'===_)return _p.map((__p,i)=>Math.max(0,1-t[i]*__p)).reduce((a,b)=>a+b,0)/n;
+    if('hinge_d'===_)return _p.map((__p,i)=>t[i]*__p<1?-t[i]/n:0);
+    if('huber'===_){const d=_p.map((__p,i)=>Math.abs(__p-t[i]));return d.map(__=>__<=1?0.5*__*__:__-0.5).reduce((a,b)=>a+b,0)/n;}
+    if('huber_d'===_){return _p.map((__p,i)=>{const d=__p-t[i];return (Math.abs(d)<=1?d:(d>0?1:-1))/n;});}
 }
 // Loss e;
 
@@ -147,13 +163,14 @@ function ___o(_,g,m){
     if('adadelta'===_){
         if(!m.c.ad.v)m.c.ad.v=m.v.map(()=>0);
         if(!m.c.ad.m)m.c.ad.m=m.v.map(()=>0);
-        for(let __=0;__<g.length;__++){
+         for(let __=0;__<g.length;__++){
             m.c.ad.v[__]=m.c.ad.b2*m.c.ad.v[__]+(1-m.c.ad.b2)*g[__]*g[__];
             let dx=Math.sqrt((m.c.ad.m[__]+m.c.ad.e)/(m.c.ad.v[__]+m.c.ad.e))*g[__];
-            m.c.ad.m[__]=m.c.ad.b2*m.c.ad.m[__]+(1-m.c.ad.b2)*dx*dx;
             m.v[__]-=dx;
+            m.c.ad.m[__]=m.c.ad.b2*m.c.ad.m[__]+(1-m.c.ad.b2)*dx*dx;
         }
     }
+
     if('adam'===_){
         if(!m.c.a.m)m.c.a.m=m.v.map(()=>0);
         if(!m.c.a.v)m.c.a.v=m.v.map(()=>0);
@@ -236,8 +253,9 @@ function ___f(e,d,m,c){
             g.forEach((_,i)=>g[i]/=b);
             ___o(m.c.optimizer,___r_(m.c.regular,g,m,w),m);
         }
+        if(l/d.length<m.c.stop_loss)m.c.train=false;
         if(c)c({epoch:_e,loss:l/d.length,lr:m.c.lr,c:m.c});
-        if(m.c.lr_decay)m.c.lr*=m.c.lr_decay;
+        if(m.c.lr_decay&&_e%m.c.epoch_lr_decay===0)m.c.lr*=m.c.lr_decay;
     }
     m.c.train=false;
 }
@@ -247,10 +265,10 @@ function ___f(e,d,m,c){
 // Regular
 function ___r_(_,g,m,w){
     if('none'===_)return g;
-    if('l1'===_)return g.map((__,i)=>__ + m.c.lambda * (__>0?1:-1) * w[i]);
+    if('l1'===_)return g.map((__,i)=>__ + m.c.lambda * (m.v[i]>0?1:-1) * w[i]);
     if('l2'===_)return g.map((__,i)=>__ + m.c.lambda * m.v[i] * w[i]);
-    if('l1_l2'===_)return g.map((__,i)=>__ + m.c.lambda * ((__>0?1:-1) + m.v[i]) * w[i]);
-    if('elastic'===_)return g.map((__,i)=>__ + m.c.lambda * (0.5 * (__>0?1:-1) + 0.5 * m.v[i]) * w[i]);
+    if('l1_l2'===_)return g.map((__,i)=>__ + m.c.lambda * ((m.v[i]>0?1:-1) + m.v[i]) * w[i]);
+    if('elastic'===_)return g.map((__,i)=>__ + m.c.lambda * (0.5 * (m.v[i]>0?1:-1) + 0.5 * m.v[i]) * w[i]);
 }
 // Regular e;
 
@@ -259,13 +277,20 @@ function ___r_(_,g,m,w){
 // Configurasi
 function ___c(){
     return{
-        lr: 0.2,
-        loss: 'mse',
-        optimizer: 'sgd',
-        batch: 1,
-        regular: 'none',
-        lambda: 0.0001,
-        train: false,
+        lr:0.2,
+        loss:'mse',
+        optimizer:'sgd',
+        batch:1,
+        regular:'none',
+        lambda:0.0001,
+        clip_a:'none',
+        min:-15,
+        max:15,
+        threshold:5,
+        lr_decay :1,
+        epoch_lr_decay:50,
+        train:false,
+        stop_loss:0.0001,
         m:{
             b:0.9,
             v:''
@@ -273,7 +298,7 @@ function ___c(){
         a:{
             b1:0.9,
             b2:0.99,
-            e:1e-25,
+            e:1e-8,
             t:0,
             v:'',
             m:''
@@ -287,19 +312,19 @@ function ___c(){
         },
         r:{
             b2:0.99,
-            e:1e-25,
+            e:1e-8,
             v:''
         },
         ad:{
-            b2:0.99,
-            e:1e-25,
+            b2:0.9,
+            e:1e-8,
             v:'',
             m:''
         },
         ax:{
             b1:0.9,
             b2:0.99,
-            e:1e-25,
+            e:1e-8,
             t:0,
             v:'',
             m:''
@@ -307,7 +332,7 @@ function ___c(){
         nd:{
             b1:0.9,
             b2:0.99,
-            e:1e-25,
+            e:1e-8,
             t:0,
             v:'',
             m:''
@@ -315,6 +340,7 @@ function ___c(){
     }
 }
 // Configurasi e;
+
 
 
 
