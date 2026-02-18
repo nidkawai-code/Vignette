@@ -1,6 +1,6 @@
 
 // Inis
-function ___i(l,a,r,_a=0.1,_b=1.0){
+function ___i(l,a,r,_a,_b){
     const v=[];
     for(let _=0;_<l.length-1;_++){
         for(let __=0;__<l[_+1];__++){
@@ -349,8 +349,9 @@ class Vignette{
         this.info='mlp _nidkawai';
         this.data=[];
     }
-    order(l,a,r,_a){
-        this.model=___i(l,a,r,_a);
+    order(l,a,r,_a,_b){
+        if(!r)r=a.map(()=>'basic');
+        this.model=___i(l,a,r,_a,_b);
         return this;
     }
     config(c){
